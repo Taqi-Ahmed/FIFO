@@ -8,6 +8,8 @@ module top;
         end
     end
 
+    FIFO_if fifoif(clk);
+    
     always_comb begin
         if(!fifoif.rst_n) begin
             assert final (
@@ -23,7 +25,6 @@ module top;
         end
     end
 
-    FIFO_if fifoif(clk);
     FIFO DUT(fifoif);
     FIFO_monitor monitor(fifoif);
     tb test(fifoif);

@@ -9,12 +9,46 @@ module tb(FIFO_if.TEST fifoif);
         f_txn_tb = new();
         test_finished = 0;
 
+        //====TESET RESET==============================================//
         fifoif.rst_n = 0;
         ->fifoif.ev_trig;
-        @(negedge fifoif.clk);
+        repeat(10) @(negedge fifoif.clk);
         fifoif.rst_n = 1;
-
-        repeat(10)begin
+        //====TESET WRITE CONSECUTIVE ==============================================//
+        repeat(100)begin
+            assert(f_txn_tb.randomize());
+            fifoif.rd_en = 0;
+            fifoif.wr_en = 1;
+            fifoif.data_in = f_txn_tb.data_in;
+            fifoif.rst_n = 1;
+            @(negedge fifoif.clk);
+            -> fifoif.ev_trig;
+            wait(fifoif.ev_monitor_finish.triggered);
+        end
+        //====TESET READ CONSECUTIVE ==============================================//
+        repeat(100)begin
+            assert(f_txn_tb.randomize());
+            fifoif.rd_en = 1;
+            fifoif.wr_en = 0;
+            fifoif.data_in = f_txn_tb.data_in;
+            fifoif.rst_n = 1;
+            @(negedge fifoif.clk);
+            -> fifoif.ev_trig;
+            wait(fifoif.ev_monitor_finish.triggered);
+        end
+        //====TESET READ and WRITE CONSECUTIVE ==============================================//
+        repeat(100)begin
+            assert(f_txn_tb.randomize());
+            fifoif.rd_en = 1;
+            fifoif.wr_en = 1;
+            fifoif.data_in = f_txn_tb.data_in;
+            fifoif.rst_n = 1;
+            @(negedge fifoif.clk);
+            -> fifoif.ev_trig;
+            wait(fifoif.ev_monitor_finish.triggered);
+        end
+        //====TESET RANDOMIZED==============================================//
+        repeat(1000)begin
             assert(f_txn_tb.randomize());
             fifoif.rd_en = f_txn_tb.rd_en;
             fifoif.wr_en = f_txn_tb.wr_en;
@@ -22,7 +56,20 @@ module tb(FIFO_if.TEST fifoif);
             fifoif.rst_n = f_txn_tb.rst_n;
             @(negedge fifoif.clk);
             -> fifoif.ev_trig;
+            wait(fifoif.ev_monitor_finish.triggered);
         end
+        
+            assert(f_txn_tb.randomize());
+            fifoif.rd_en = f_txn_tb.rd_en;
+            fifoif.wr_en = f_txn_tb.wr_en;
+            fifoif.data_in = f_txn_tb.data_in;
+            fifoif.rst_n = f_txn_tb.rst_n;
+            @(negedge fifoif.clk);
+            -> fifoif.ev_trig;
+            
+        
+        //====TESET FINISHED==============================================//
+
         test_finished = 1;
         
     end

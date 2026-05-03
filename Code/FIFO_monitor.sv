@@ -28,6 +28,8 @@
                 f_txn_mon.almostempty = fifoif.almostempty;
                 f_txn_mon.almostfull = fifoif.almostfull;
                 f_txn_mon.overflow = fifoif.overflow;
+                f_txn_mon.underflow = fifoif.underflow;
+                
                 //forking to run coverage and scoreboard in parallel
                 fork
                     begin
@@ -39,6 +41,7 @@
                     end
                 join
                 
+                ->fifoif.ev_monitor_finish;
                 //check if test finished then stop simulation
                 if(test_finished) begin
                     $display("TEST FINISHED: Correct Count = %0d, Error Count = %0d", correct_count,error_count);

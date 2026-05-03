@@ -4,7 +4,5 @@ vsim -voptargs=+acc work.top -cover
 add wave *
 coverage save top.ucdb  -onexit
 run 0
-add wave -position end  sim:/top/monitor/f_cov
-add wave -position end  sim:/top/monitor/f_txn_mon
-add wave -position end  sim:/top/monitor/f_sb
+do wave.do
 run -all

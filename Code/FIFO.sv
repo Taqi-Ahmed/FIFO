@@ -17,12 +17,15 @@ reg [max_fifo_addr:0] count;
 
 always @(posedge fifoif.clk or negedge fifoif.rst_n) begin
 	if (!fifoif.rst_n) begin
-		wr_ptr <= 0;
+		wr_ptr <= 0;			
+		fifoif.wr_ack <= 0;		//BUG: reset wr_ack was missing
+		fifoif.overflow <= 0; 	//BUG: reset for overflow was missing
 	end
 	else if (fifoif.wr_en && count < fifoif.FIFO_DEPTH) begin
 		mem[wr_ptr] <= fifoif.data_in;
 		fifoif.wr_ack <= 1;
 		wr_ptr <= wr_ptr + 1;
+		fifoif.overflow <= 0;  //BUG: should pull overflow back to 0 if we wrote normally
 	end
 	else begin 
 		fifoif.wr_ack <= 0; 
@@ -36,29 +39,45 @@ end
 always @(posedge fifoif.clk or negedge fifoif.rst_n) begin
 	if (!fifoif.rst_n) begin
 		rd_ptr <= 0;
+		fifoif.data_out <= 0; //BUG: reset for dataout was missing	
+		fifoif.underflow <= 0; //BUG: reset for underflow was missing	
 	end
 	else if (fifoif.rd_en && count != 0) begin
 		fifoif.data_out <= mem[rd_ptr];
 		rd_ptr <= rd_ptr + 1;
+		fifoif.underflow<= 0; //BUG: should pull underflow back to 0 if we read normally
+	end
+	else begin  //BUG: handling of underflow was missing
+		if (fifoif.empty & fifoif.rd_en)
+			fifoif.underflow <= 1;
+		else
+			fifoif.underflow <= 0;
 	end
 end
 
 always @(posedge fifoif.clk or negedge fifoif.rst_n) begin
 	if (!fifoif.rst_n) begin
 		count <= 0;
+		
 	end
 	else begin
 		if	( ({fifoif.wr_en, fifoif.rd_en} == 2'b10) && !fifoif.full) 
 			count <= count + 1;
 		else if ( ({fifoif.wr_en, fifoif.rd_en} == 2'b01) && !fifoif.empty)
 			count <= count - 1;
+		//BUG: should check when both are high and increment counter if empty
+		else if	( ({fifoif.wr_en, fifoif.rd_en} == 2'b11) && fifoif.empty) 
+			count <= count + 1;
+		//BUG: should check when both are high and decrement counter based if full
+		else if ( ({fifoif.wr_en, fifoif.rd_en} == 2'b11) && fifoif.full)
+			count <= count - 1;
 	end
 end
 
 assign fifoif.full = (count == fifoif.FIFO_DEPTH)? 1 : 0;
 assign fifoif.empty = (count == 0)? 1 : 0;
-assign fifoif.underflow = (fifoif.empty && fifoif.rd_en)? 1 : 0; 
-assign fifoif.almostfull = (count == fifoif.FIFO_DEPTH-2)? 1 : 0; 
+//assign fifoif.underflow = (fifoif.empty && fifoif.rd_en)? 1 : 0; //BUG: underflow should be driven as a sequential signal
+assign fifoif.almostfull = (count == fifoif.FIFO_DEPTH-1)? 1 : 0; //BUG: was written as fifodepth -2 instead of 1
 assign fifoif.almostempty = (count == 1)? 1 : 0;
 
 //=================== ASSERTIONS
