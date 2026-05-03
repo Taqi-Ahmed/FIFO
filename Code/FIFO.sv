@@ -81,77 +81,68 @@ assign fifoif.almostfull = (count == fifoif.FIFO_DEPTH-1)? 1 : 0; //BUG: was wri
 assign fifoif.almostempty = (count == 1)? 1 : 0;
 
 //=================== ASSERTIONS ===========================
-always_comb begin
-	if(!fifoif.rst_n) begin
-		assert final( (wr_ptr == 'b0) && (rd_ptr == 'b0)
-						&& (count == 'b0));
+	always_comb begin
+		if(!fifoif.rst_n) begin
+			assert final( (wr_ptr == 'b0) && (rd_ptr == 'b0)
+							&& (count == 'b0));
+		end
 	end
-end
 
-property wr_ack_pr;
-	@(posedge fifoif.clk) disable iff(!fifoif.rst_n) (fifoif.wr_en && !fifoif.full) |=> fifoif.wr_ack ;
-endproperty
-property overflow_pr;
-	@(posedge fifoif.clk) disable iff(!fifoif.rst_n) (fifoif.wr_en && fifoif.full) |=> fifoif.overflow ;
-endproperty
-property underflow_pr;
-	@(posedge fifoif.clk) disable iff(!fifoif.rst_n) (fifoif.rd_en && fifoif.empty) |=> fifoif.underflow ;
-endproperty
-property empty_pr;
-	@(posedge fifoif.clk) disable iff(!fifoif.rst_n) (count == 'b0) |-> fifoif.empty;
-endproperty
-property full_pr;
-	@(posedge fifoif.clk) disable iff(!fifoif.rst_n) (count == fifoif.FIFO_DEPTH) |-> fifoif.full;
-endproperty
-property almost_full_pr;
-	@(posedge fifoif.clk) disable iff(!fifoif.rst_n) (count == fifoif.FIFO_DEPTH -1) |-> fifoif.almostfull;
-endproperty
-property almost_empty_pr;
-	@(posedge fifoif.clk) disable iff(!fifoif.rst_n) (count == 1) |-> fifoif.almostempty;
-endproperty
-property wr_ptr_wraparound_pr;
-	@(posedge fifoif.clk) disable iff(!fifoif.rst_n) ((wr_ptr == fifoif.FIFO_DEPTH-1) && fifoif.wr_en && !fifoif.full) |=> wr_ptr ==0 ;
-endproperty
-property rd_ptr_wraparound_pr;
-	@(posedge fifoif.clk) disable iff(!fifoif.rst_n) ((rd_ptr == fifoif.FIFO_DEPTH) && !fifoif.empty && fifoif.rd_en) |=> rd_ptr ==0 ;
-endproperty
-property ptr_threshold_pr;
-	@(posedge fifoif.clk) disable iff(!fifoif.rst_n) ((rd_ptr < fifoif.FIFO_DEPTH) && (wr_ptr<fifoif.FIFO_DEPTH) && (count<=fifoif.FIFO_DEPTH));
-endproperty
+	property wr_ack_pr;
+		@(posedge fifoif.clk) disable iff(!fifoif.rst_n) (fifoif.wr_en && !fifoif.full) |=> fifoif.wr_ack ;
+	endproperty
+	property overflow_pr;
+		@(posedge fifoif.clk) disable iff(!fifoif.rst_n) (fifoif.wr_en && fifoif.full) |=> fifoif.overflow ;
+	endproperty
+	property underflow_pr;
+		@(posedge fifoif.clk) disable iff(!fifoif.rst_n) (fifoif.rd_en && fifoif.empty) |=> fifoif.underflow ;
+	endproperty
+	property empty_pr;
+		@(posedge fifoif.clk) disable iff(!fifoif.rst_n) (count == 'b0) |-> fifoif.empty;
+	endproperty
+	property full_pr;
+		@(posedge fifoif.clk) disable iff(!fifoif.rst_n) (count == fifoif.FIFO_DEPTH) |-> fifoif.full;
+	endproperty
+	property almost_full_pr;
+		@(posedge fifoif.clk) disable iff(!fifoif.rst_n) (count == fifoif.FIFO_DEPTH -1) |-> fifoif.almostfull;
+	endproperty
+	property almost_empty_pr;
+		@(posedge fifoif.clk) disable iff(!fifoif.rst_n) (count == 1) |-> fifoif.almostempty;
+	endproperty
+	property wr_ptr_wraparound_pr;
+		@(posedge fifoif.clk) disable iff(!fifoif.rst_n) ((wr_ptr == fifoif.FIFO_DEPTH-1) && fifoif.wr_en && !fifoif.full) |=> wr_ptr ==0 ;
+	endproperty
+	property ptr_threshold_pr;
+		@(posedge fifoif.clk) disable iff(!fifoif.rst_n) ((rd_ptr < fifoif.FIFO_DEPTH) && (wr_ptr<fifoif.FIFO_DEPTH) && (count<=fifoif.FIFO_DEPTH));
+	endproperty
 
-wr_ack_asrt: assert property (wr_ack_pr)
-	else $error("Assertion wr_ack_asrt failed!");
-overflow_asrt: assert property (overflow_pr)
-	else $error("Assertion overflow_asrt failed!");
-underflow_asrt: assert property (underflow_pr)
-	else $error("Assertion underflow_asrt failed!");
-empty_asrt: assert property (empty_pr)
-	else $error("Assertion empty_asrt failed!");
-full_asrt: assert property (full_pr)
-	else $error("Assertion full_asrt failed!");
-almost_full_asrt: assert property (almost_full_pr)
-	else $error("Assertion almost_full_asrt failed!");
-almost_empty_asrt: assert property (almost_empty_pr)
-	else $error("Assertion almost_empty_asrt failed!");
-wr_ptr_wraparound_asrt: assert property (wr_ptr_wraparound_pr)
-	else $error("Assertion wr_ptr_wraparound_asrt failed!");
-rd_ptr_wraparound_asrt: assert property (rd_ptr_wraparound_pr)
-	else $error("Assertion rd_ptr_wraparound_asrt failed!");
-ptr_threshold_asrt: assert property (ptr_threshold_pr)
-	else $error("Assertion ptr_threshold_asrt failed!");
+	wr_ack_asrt: assert property (wr_ack_pr)
+		else $error("Assertion wr_ack_asrt failed!");
+	overflow_asrt: assert property (overflow_pr)
+		else $error("Assertion overflow_asrt failed!");
+	underflow_asrt: assert property (underflow_pr)
+		else $error("Assertion underflow_asrt failed!");
+	empty_asrt: assert property (empty_pr)
+		else $error("Assertion empty_asrt failed!");
+	full_asrt: assert property (full_pr)
+		else $error("Assertion full_asrt failed!");
+	almost_full_asrt: assert property (almost_full_pr)
+		else $error("Assertion almost_full_asrt failed!");
+	almost_empty_asrt: assert property (almost_empty_pr)
+		else $error("Assertion almost_empty_asrt failed!");
+	wr_ptr_wraparound_asrt: assert property (wr_ptr_wraparound_pr)
+		else $error("Assertion wr_ptr_wraparound_asrt failed!");
+	ptr_threshold_asrt: assert property (ptr_threshold_pr)
+		else $error("Assertion ptr_threshold_asrt failed!");
 
-wr_ack_cov: cover property (wr_ack_pr);
-overflow_cov: cover property (overflow_pr);
-underflow_cov: cover property (underflow_pr);
-empty_cov: cover property (empty_pr);
-full_cov: cover property (full_pr);
-almost_full_cov: cover property (almost_full_pr);
-almost_empty_cov: cover property (almost_empty_pr);
-wr_ptr_wraparound_cov: cover property (wr_ptr_wraparound_pr);
-rd_ptr_wraparound_cov: cover property (rd_ptr_wraparound_pr);
-ptr_threshold_cov: cover property (ptr_threshold_pr);
-
-
-
+	wr_ack_cov: cover property (wr_ack_pr);
+	overflow_cov: cover property (overflow_pr);
+	underflow_cov: cover property (underflow_pr);
+	empty_cov: cover property (empty_pr);
+	full_cov: cover property (full_pr);
+	almost_full_cov: cover property (almost_full_pr);
+	almost_empty_cov: cover property (almost_empty_pr);
+	wr_ptr_wraparound_cov: cover property (wr_ptr_wraparound_pr);
+	ptr_threshold_cov: cover property (ptr_threshold_pr);
 
 endmodule

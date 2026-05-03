@@ -1,0 +1,1 @@
+vcover report top.ucdb -details -annotate -all -output cvr_rpt.txt
