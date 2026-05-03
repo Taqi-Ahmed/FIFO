@@ -80,7 +80,7 @@ assign fifoif.empty = (count == 0)? 1 : 0;
 assign fifoif.almostfull = (count == fifoif.FIFO_DEPTH-1)? 1 : 0; //BUG: was written as fifodepth -2 instead of 1
 assign fifoif.almostempty = (count == 1)? 1 : 0;
 
-//=================== ASSERTIONS
+//=================== ASSERTIONS ===========================
 always_comb begin
 	if(!fifoif.rst_n) begin
 		assert final( (wr_ptr == 'b0) && (rd_ptr == 'b0)

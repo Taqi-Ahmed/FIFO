@@ -23,8 +23,6 @@ module tb(FIFO_if.TEST fifoif);
             fifoif.rst_n = 1;
             -> fifoif.ev_trig;
             @(negedge fifoif.clk);
-            // -> fifoif.ev_trig;
-            //wait(fifoif.ev_monitor_finish.triggered);
         end
         //====TESET READ CONSECUTIVE ==============================================//
         repeat(100)begin
@@ -35,8 +33,6 @@ module tb(FIFO_if.TEST fifoif);
             fifoif.rst_n = 1;
             -> fifoif.ev_trig;
             @(negedge fifoif.clk);
-            // -> fifoif.ev_trig;
-            // wait(fifoif.ev_monitor_finish.triggered);
         end
         //====TESET READ and WRITE CONSECUTIVE ==============================================//
         repeat(100)begin
@@ -47,32 +43,17 @@ module tb(FIFO_if.TEST fifoif);
             fifoif.rst_n = 1;
             -> fifoif.ev_trig;
             @(negedge fifoif.clk);
-            // -> fifoif.ev_trig;
-            // wait(fifoif.ev_monitor_finish.triggered);
         end
         //====TESET RANDOMIZED==============================================//
-        repeat(1000)begin
+        repeat(10000)begin
             assert(f_txn_tb.randomize());
             fifoif.rd_en = f_txn_tb.rd_en;
             fifoif.wr_en = f_txn_tb.wr_en;
             fifoif.data_in = f_txn_tb.data_in;
             fifoif.rst_n = f_txn_tb.rst_n;
             -> fifoif.ev_trig;
-            @(negedge fifoif.clk);
-            // -> fifoif.ev_trig;
-            // wait(fifoif.ev_monitor_finish.triggered);
-        end
-        
-            assert(f_txn_tb.randomize());
-            fifoif.rd_en = f_txn_tb.rd_en;
-            fifoif.wr_en = f_txn_tb.wr_en;
-            fifoif.data_in = f_txn_tb.data_in;
-            fifoif.rst_n = f_txn_tb.rst_n;
-            -> fifoif.ev_trig;
-            @(negedge fifoif.clk);
-            // -> fifoif.ev_trig;
-            
-        
+            @(negedge fifoif.clk);         
+        end        
         //====TESET FINISHED==============================================//
 
         test_finished = 1;

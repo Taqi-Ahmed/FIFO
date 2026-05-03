@@ -9,15 +9,15 @@
         FIFO_scoreboard f_sb;
         initial begin
             f_cov = new();
-            f_txn_mon = new;
+            f_txn_mon = new();
             f_sb = new();
 
             forever begin
+                //=====wait for test to trigger event================
                 wait(fifoif.ev_trig.triggered);
                 @(negedge fifoif.clk);
-                //wait for test to trigger event 
-                //wait(fifoif.ev_trig.triggered);
-                //sample signals from interface into the transaction object
+
+                //=====sample signals from interface into the transaction object=======
                 f_txn_mon.rst_n = fifoif.rst_n;
                 f_txn_mon.rd_en = fifoif.rd_en;
                 f_txn_mon.wr_en = fifoif.wr_en;
@@ -30,8 +30,7 @@
                 f_txn_mon.almostfull = fifoif.almostfull;
                 f_txn_mon.overflow = fifoif.overflow;
                 f_txn_mon.underflow = fifoif.underflow;
-                
-                //forking to run coverage and scoreboard in parallel
+                //=====forking to run coverage and scoreboard in parallel=========
                 fork
                     begin
                         f_cov.sample_data(f_txn_mon);
@@ -41,9 +40,7 @@
                         f_sb.check_data(f_txn_mon);
                     end
                 join
-
-                ->fifoif.ev_monitor_finish;
-                //check if test finished then stop simulation
+                //====check if test finished then stop simulation==========
                 if(test_finished) begin
                     $display("TEST FINISHED: Correct Count = %0d, Error Count = %0d", correct_count,error_count);
                     $stop;
