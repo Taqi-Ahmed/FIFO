@@ -5,7 +5,6 @@ package FIFO_coverage_pkg;
         FIFO_transaction F_cvg_txn;
 
         covergroup cov_group;
-            option.auto_bin_max = 0;
             wr_en_cp: coverpoint F_cvg_txn.wr_en{
                 option.weight = 0;
             }
@@ -34,13 +33,13 @@ package FIFO_coverage_pkg;
                 option.weight = 0;
             }
 
-
+            wr_rd_en_wr_ack_cp :cross wr_en_cp,rd_en_cp,wr_ack_cp;
             wr_rd_en_full_cp :cross wr_en_cp,rd_en_cp,fullcp; 
             wr_rd_en_empty_cp :cross wr_en_cp,rd_en_cp,empty_cp; 
-            wr_rd_en_almostfull_cp :cross wr_en_cp,rd_en_cp,almostfull; 
-            wr_rd_en_full_cp :cross wr_en_cp,rd_en_cp,almostempty_cp; 
-            wr_rd_en_full_cp :cross wr_en_cp,rd_en_cp,overflowcp; 
-            wr_rd_en_full_cp :cross wr_en_cp,rd_en_cp,underflow_cp; 
+            wr_rd_en_almostfull_cp :cross wr_en_cp,rd_en_cp,almostfull_cp; 
+            wr_rd_en_almostempty_cp :cross wr_en_cp,rd_en_cp,almostempty_cp; 
+            wr_rd_en_overflow_cp :cross wr_en_cp,rd_en_cp,overflowcp; 
+            wr_rd_en_underflow_cp :cross wr_en_cp,rd_en_cp,underflow_cp; 
 
         endgroup
 

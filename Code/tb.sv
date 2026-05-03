@@ -1,29 +1,31 @@
-module tb;
+import shared_pkg::*;
+import FIFO_transaction_pkg::*;
 
-    parameter FIFO_WIDTH = 16;
-    parameter FIFO_DEPTH = 8;
-    logic [FIFO_WIDTH-1:0] data_in;
-    logic clk, rst_n, wr_en, rd_en;
-    logic  [FIFO_WIDTH-1:0] data_out;
-    logic  wr_ack, overflow;
-    logic full, empty, almostfull, almostempty, underflow;
+module tb(FIFO_if.TEST fifoif);
 
-    //Instantiate the DUT
-    FIFO #(FIFO_WIDTH,FIFO_WIDTH) DUT(
-        .clk(clk),
-        .rst_n(rst_n),
-        .wr_en(wr_en),
-        .rd_en(rd_en),
-        .data_in(data_in),
-        .data_out(data_out),
-        .wr_ack(wr_ack),
-        .overflow(overflow),
-        .underflow(underflow)
-        .full(full),
-        .empty(empty),
-        .almostfull(almostfull),
-        .almostempty(almostempty)  
-    );
+    FIFO_transaction f_txn_tb;
+
+    initial begin
+        f_txn_tb = new();
+        test_finished = 0;
+
+        fifoif.rst_n = 0;
+        ->fifoif.ev_trig;
+        @(negedge fifoif.clk);
+        fifoif.rst_n = 1;
+
+        repeat(10)begin
+            assert(f_txn_tb.randomize());
+            fifoif.rd_en = f_txn_tb.rd_en;
+            fifoif.wr_en = f_txn_tb.wr_en;
+            fifoif.data_in = f_txn_tb.data_in;
+            fifoif.rst_n = f_txn_tb.rst_n;
+            @(negedge fifoif.clk);
+            -> fifoif.ev_trig;
+        end
+        test_finished = 1;
+        
+    end
 
 
     
