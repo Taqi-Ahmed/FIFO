@@ -13,9 +13,10 @@
             f_sb = new();
 
             forever begin
+                wait(fifoif.ev_trig.triggered);
                 @(negedge fifoif.clk);
                 //wait for test to trigger event 
-                wait(fifoif.ev_trig.triggered);
+                //wait(fifoif.ev_trig.triggered);
                 //sample signals from interface into the transaction object
                 f_txn_mon.rst_n = fifoif.rst_n;
                 f_txn_mon.rd_en = fifoif.rd_en;
@@ -40,7 +41,7 @@
                         f_sb.check_data(f_txn_mon);
                     end
                 join
-                
+
                 ->fifoif.ev_monitor_finish;
                 //check if test finished then stop simulation
                 if(test_finished) begin

@@ -21,9 +21,10 @@ module tb(FIFO_if.TEST fifoif);
             fifoif.wr_en = 1;
             fifoif.data_in = f_txn_tb.data_in;
             fifoif.rst_n = 1;
-            @(negedge fifoif.clk);
             -> fifoif.ev_trig;
-            wait(fifoif.ev_monitor_finish.triggered);
+            @(negedge fifoif.clk);
+            // -> fifoif.ev_trig;
+            //wait(fifoif.ev_monitor_finish.triggered);
         end
         //====TESET READ CONSECUTIVE ==============================================//
         repeat(100)begin
@@ -32,9 +33,10 @@ module tb(FIFO_if.TEST fifoif);
             fifoif.wr_en = 0;
             fifoif.data_in = f_txn_tb.data_in;
             fifoif.rst_n = 1;
-            @(negedge fifoif.clk);
             -> fifoif.ev_trig;
-            wait(fifoif.ev_monitor_finish.triggered);
+            @(negedge fifoif.clk);
+            // -> fifoif.ev_trig;
+            // wait(fifoif.ev_monitor_finish.triggered);
         end
         //====TESET READ and WRITE CONSECUTIVE ==============================================//
         repeat(100)begin
@@ -43,9 +45,10 @@ module tb(FIFO_if.TEST fifoif);
             fifoif.wr_en = 1;
             fifoif.data_in = f_txn_tb.data_in;
             fifoif.rst_n = 1;
-            @(negedge fifoif.clk);
             -> fifoif.ev_trig;
-            wait(fifoif.ev_monitor_finish.triggered);
+            @(negedge fifoif.clk);
+            // -> fifoif.ev_trig;
+            // wait(fifoif.ev_monitor_finish.triggered);
         end
         //====TESET RANDOMIZED==============================================//
         repeat(1000)begin
@@ -54,9 +57,10 @@ module tb(FIFO_if.TEST fifoif);
             fifoif.wr_en = f_txn_tb.wr_en;
             fifoif.data_in = f_txn_tb.data_in;
             fifoif.rst_n = f_txn_tb.rst_n;
-            @(negedge fifoif.clk);
             -> fifoif.ev_trig;
-            wait(fifoif.ev_monitor_finish.triggered);
+            @(negedge fifoif.clk);
+            // -> fifoif.ev_trig;
+            // wait(fifoif.ev_monitor_finish.triggered);
         end
         
             assert(f_txn_tb.randomize());
@@ -64,13 +68,16 @@ module tb(FIFO_if.TEST fifoif);
             fifoif.wr_en = f_txn_tb.wr_en;
             fifoif.data_in = f_txn_tb.data_in;
             fifoif.rst_n = f_txn_tb.rst_n;
-            @(negedge fifoif.clk);
             -> fifoif.ev_trig;
+            @(negedge fifoif.clk);
+            // -> fifoif.ev_trig;
             
         
         //====TESET FINISHED==============================================//
 
         test_finished = 1;
+        -> fifoif.ev_trig;
+        @(negedge fifoif.clk);
         
     end
 
